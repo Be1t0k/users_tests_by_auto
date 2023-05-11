@@ -1,0 +1,720 @@
+{
+	"info": {
+		"_postman_id": "7fa44353-8b74-44cc-978d-2895417c0e61",
+		"name": "TestingUsersByAuto",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24582399"
+	},
+	"item": [
+		{
+			"name": "positive",
+			"item": [
+				{
+					"name": "doregister_random_values",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"Name include 'Павел'\", function () {\r",
+									"    pm.expect(jsonData.name).is.include(\"Павел\");\r",
+									"});\r",
+									"pm.test(\"email has my value\", function () {\r",
+									"    pm.expect(jsonData.email).is.include(\"moshkov.p\");\r",
+									"});\r",
+									"pm.test(\"Check count keys\", function () {\r",
+									"    pm.expect(Object.keys(jsonData).length).to.eql(8);\r",
+									"});\r",
+									"console.log(Object.keys(jsonData));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\": \"moshkov.p{{$guid}}@gmail.com\",\r\n    \"name\": \"Павел{{$randomInt}}\",\r\n    \"password\": 12345\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://users.bugred.ru/tasks/rest/doregister",
+							"protocol": "http",
+							"host": [
+								"users",
+								"bugred",
+								"ru"
+							],
+							"path": [
+								"tasks",
+								"rest",
+								"doregister"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "main user register",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"Name include 'Павел'\", function () {\r",
+									"    pm.expect(jsonData.name).is.include(\"Павел\");\r",
+									"});\r",
+									"pm.test(\"email has my value\", function () {\r",
+									"    pm.expect(jsonData.email).is.include(\"moshkov.p2018@gmail.com\");\r",
+									"    pm.expect(jsonData.email).to.have.lengthOf(55);\r",
+									"});\r",
+									"pm.test(\"Check birthday\", function () {\r",
+									"    pm.expect(jsonData.birthday).is.eql(0);\r",
+									"});\r",
+									"postman.setEnvironmentVariable('email', jsonData.email);\r",
+									"postman.setEnvironmentVariable('name', jsonData.name);\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://users.bugred.ru/tasks/rest/doregister?email=moshkov.p2018@gmail.com&name=Павел&password=12345",
+							"protocol": "http",
+							"host": [
+								"users",
+								"bugred",
+								"ru"
+							],
+							"path": [
+								"tasks",
+								"rest",
+								"doregister"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "moshkov.p2018@gmail.com"
+								},
+								{
+									"key": "name",
+									"value": "Павел"
+								},
+								{
+									"key": "password",
+									"value": "12345"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_company_owner_main",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"Company created\", function () {\r",
+									"    pm.expect(typeof jsonData.company.name).is.eql(\"string\");\r",
+									"    pm.expect(typeof jsonData.id_company).is.eql(\"number\");\r",
+									"});\r",
+									"pm.test(\"Company type is correct\", function () {\r",
+									"    pm.expect(jsonData.company.type).to.be.oneOf([\"ооо\", \"ООО\",\"оао\", \"ОАО\", \"ип\", \"ИП\"]);\r",
+									"});\r",
+									"pm.test(\"Check headers\", function () {\r",
+									"    pm.response.headers.has(\"Content-Type\", \"application/json\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"company_name\": \"Moshkov_company\",\r\n  \"company_type\": \"ООО\",\r\n  \"company_users\": [\"moshkov.p2018@gmail.com\", \"mrak20@list.ru\"],\r\n  \"email_owner\": \"{{email_main}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://users.bugred.ru/tasks/rest/createcompany",
+							"protocol": "http",
+							"host": [
+								"users",
+								"bugred",
+								"ru"
+							],
+							"path": [
+								"tasks",
+								"rest",
+								"createcompany"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user&tasks_without_companies(method_include_array))",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"Companies not assigned, tasks created\", function () {\r",
+									"    pm.expect(jsonData.companies).to.be.null;\r",
+									"    pm.expect(jsonData.tasks).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.tasks).has.length(3);\r",
+									"    pm.expect(jsonData.role).to.not.have.lengthOf(0);\r",
+									"});\r",
+									"pm.test(\"Correct date info\", function () {\r",
+									"    pm.expect(jsonData.data).to.be.eql.toString((pm.variables.get(\"currentdate\")));\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var moment = require('moment');\r",
+									"postman.setEnvironmentVariable('currentdate', moment().format((\"YYYY-MM-DD\")));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n \"email\": \"moshk{{$randomInt}}@gmail.com\",\r\n \"name\": \"Mtest{{$randomInt}}\",\r\n \"tasks\": [{\r\n   \"title\": \"задача 1\",\r\n   \"description\": \"Очень тяжелое задание\"\r\n  },\r\n  {\r\n   \"title\": \"задача 2\",\r\n   \"description\": \"Довольно простое задание\"\r\n  },\r\n  {\r\n   \"title\": \"задача 3\",\r\n   \"description\": \"среднее по сложности задание\"\r\n  }\r\n ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://users.bugred.ru/tasks/rest/createuserwithtasks",
+							"protocol": "http",
+							"host": [
+								"users",
+								"bugred",
+								"ru"
+							],
+							"path": [
+								"tasks",
+								"rest",
+								"createuserwithtasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add_avatar(include_files)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"Status ok\", function () {\r",
+									"    pm.expect(jsonData.status).is.eql(\"ok\");\r",
+									"});\r",
+									"pm.test(\"result is not error\", function () {\r",
+									"    pm.expect(jsonData.type).is.not.eql(\"error\");\r",
+									"    pm.expect(pm.response.text()).to.not.include(\"error\");\r",
+									"});\r",
+									"pm.test(\"Response contains cookie\", function () {\r",
+									"    pm.expect(pm.cookies.has('PHPSESSID')).to.be.true;\r",
+									"    pm.expect(pm.cookies.get('PHPSESSID')).to.eql(pm.variables.get(\"php_coockie\"));\r",
+									"});\r",
+									"pm.test(\"Response time is less than 600ms\", () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(1500);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "X9eCsxhO-/Cartoons__002859_.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://users.bugred.ru/tasks/rest/addavatar?email=moshkov.p2018@gmail.com",
+							"protocol": "http",
+							"host": [
+								"users",
+								"bugred",
+								"ru"
+							],
+							"path": [
+								"tasks",
+								"rest",
+								"addavatar"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "moshkov.p2018@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "negative",
+			"item": [
+				{
+					"name": "doregister_random_values_missing_body",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"Name include 'Павел'\", function () {\r",
+									"    pm.expect(jsonData.name).is.include(\"Павел\");\r",
+									"});\r",
+									"pm.test(\"email has my value\", function () {\r",
+									"    pm.expect(jsonData.email).is.include(\"moshkov.p\");\r",
+									"});\r",
+									"pm.test(\"Check count keys\", function () {\r",
+									"    pm.expect(Object.keys(jsonData).length).to.eql(8);\r",
+									"});\r",
+									"console.log(Object.keys(jsonData));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"Павел{{$randomInt}}\", \r\n    \"password\": 12345\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://users.bugred.ru/tasks/rest/doregister",
+							"protocol": "http",
+							"host": [
+								"users",
+								"bugred",
+								"ru"
+							],
+							"path": [
+								"tasks",
+								"rest",
+								"doregister"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "main user register_upper_email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"Name include 'Павел'\", function () {\r",
+									"    pm.expect(jsonData.name).is.include(\"Павел\");\r",
+									"});\r",
+									"pm.test(\"email has my value\", function () {\r",
+									"    pm.expect(jsonData.email).is.include(\"moshkov.p2018@gmail.com\");\r",
+									"    pm.expect(jsonData.email).to.have.lengthOf(55);\r",
+									"});\r",
+									"pm.test(\"Check birthday\", function () {\r",
+									"    pm.expect(jsonData.birthday).is.eql(0);\r",
+									"});\r",
+									"postman.setEnvironmentVariable('email', jsonData.email);\r",
+									"postman.setEnvironmentVariable('name', jsonData.name);\r",
+									"\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "http://users.bugred.ru/tasks/rest/doregister?email=MOSHKOV.p2018@gmail.com&name=Павел_new&password=12345",
+							"protocol": "http",
+							"host": [
+								"users",
+								"bugred",
+								"ru"
+							],
+							"path": [
+								"tasks",
+								"rest",
+								"doregister"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "MOSHKOV.p2018@gmail.com"
+								},
+								{
+									"key": "name",
+									"value": "Павел_new"
+								},
+								{
+									"key": "password",
+									"value": "12345"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_company_owner_main_invalid_case_comp-type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"Company created\", function () {\r",
+									"    pm.expect(typeof jsonData.company.name).is.eql(\"string\");\r",
+									"    pm.expect(typeof jsonData.id_company).is.eql(\"number\");\r",
+									"});\r",
+									"pm.test(\"Company type is correct\", function () {\r",
+									"    pm.expect(jsonData.company.type).to.be.oneOf([\"ооо\", \"ООО\",\"оао\", \"ОАО\", \"ип\", \"ИП\"]);\r",
+									"});\r",
+									"pm.test(\"Check headers\", function () {\r",
+									"    pm.response.headers.has(\"Content-Type\", \"application/json\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"company_name\": \"Moshkov_company\",\r\n  \"company_type\": \"ОоО\",\r\n  \"company_users\": [\"moshkov.p2018@gmail.com\", \"mrak20@list.ru\"],\r\n  \"email_owner\": \"{{email_main}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://users.bugred.ru/tasks/rest/createcompany",
+							"protocol": "http",
+							"host": [
+								"users",
+								"bugred",
+								"ru"
+							],
+							"path": [
+								"tasks",
+								"rest",
+								"createcompany"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "create_company_owner_main_empty_users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"Company created\", function () {\r",
+									"    pm.expect(typeof jsonData.company.name).is.eql(\"string\");\r",
+									"    pm.expect(typeof jsonData.id_company).is.eql(\"number\");\r",
+									"});\r",
+									"pm.test(\"Company type is correct\", function () {\r",
+									"    pm.expect(jsonData.company.type).to.be.oneOf([\"ооо\", \"ООО\",\"оао\", \"ОАО\", \"ип\", \"ИП\"]);\r",
+									"});\r",
+									"pm.test(\"Check headers\", function () {\r",
+									"    pm.response.headers.has(\"Content-Type\", \"application/json\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n  \"company_name\": \"Moshkov_company\",\r\n  \"company_type\": \"ООО\",\r\n  \"company_users\": [\"\",\"\"],\r\n  \"email_owner\": \"{{email_main}}\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://users.bugred.ru/tasks/rest/createcompany",
+							"protocol": "http",
+							"host": [
+								"users",
+								"bugred",
+								"ru"
+							],
+							"path": [
+								"tasks",
+								"rest",
+								"createcompany"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "user&tasks_without_companies(method_include_array)) Copy",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"Companies not assigned, tasks created\", function () {\r",
+									"    pm.expect(jsonData.companies).to.be.null;\r",
+									"    pm.expect(jsonData.tasks).to.be.an(\"array\");\r",
+									"    pm.expect(jsonData.tasks).has.length(3);\r",
+									"    pm.expect(jsonData.role).to.not.have.lengthOf(0);\r",
+									"});\r",
+									"pm.test(\"Correct date info\", function () {\r",
+									"    pm.expect(jsonData.data).to.be.eql.toString((pm.variables.get(\"currentdate\")));\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"var moment = require('moment');\r",
+									"postman.setEnvironmentVariable('currentdate', moment().format((\"YYYY-MM-DD\")));"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n \"email\": \"moshk{{$randomInt}}@gmail.com\",\r\n \"name\": \"Mtest{{$randomInt}}\",\r\n \"tasks\": [{\r\n   \"title\": \"задача 1\",\r\n   \"description\": \"Очень тяжелое задание\"\r\n  },\r\n  {\r\n   \"title\": \"задача 2\",\r\n   \"description\": \"Довольно простое задание\"\r\n  },\r\n  {\r\n   \"title\": \"задача 3\",\r\n   \"description\": \"среднее по сложности задание\"\r\n  }\r\n ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://users.bugred.ru/tasks/rest/createuserwithtasks",
+							"protocol": "http",
+							"host": [
+								"users",
+								"bugred",
+								"ru"
+							],
+							"path": [
+								"tasks",
+								"rest",
+								"createuserwithtasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "add_avatar(include_files)_big_file",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"Status ok\", function () {\r",
+									"    pm.expect(jsonData.status).is.eql(\"ok\");\r",
+									"});\r",
+									"pm.test(\"result is not error\", function () {\r",
+									"    pm.expect(jsonData.type).is.not.eql(\"error\");\r",
+									"    pm.expect(pm.response.text()).to.not.include(\"error\");\r",
+									"});\r",
+									"pm.test(\"Response contains cookie\", function () {\r",
+									"    pm.expect(pm.cookies.has('PHPSESSID')).to.be.true;\r",
+									"    pm.expect(pm.cookies.get('PHPSESSID')).to.eql(pm.variables.get(\"php_coockie\"));\r",
+									"});\r",
+									"pm.test(\"Response time is less than 600ms\", () => {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(1500);\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "avatar",
+									"type": "file",
+									"src": "W4z7AoeVn/goroda-monte-karlo-monako-monaco-panoram-761411.jpg"
+								}
+							]
+						},
+						"url": {
+							"raw": "http://users.bugred.ru/tasks/rest/addavatar?email=moshkov.p2018@gmail.com",
+							"protocol": "http",
+							"host": [
+								"users",
+								"bugred",
+								"ru"
+							],
+							"path": [
+								"tasks",
+								"rest",
+								"addavatar"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "moshkov.p2018@gmail.com"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "bugs",
+			"item": [
+				{
+					"name": "update_one_field",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();\r",
+									"pm.test(\"Name changed\", function () {\r",
+									"    pm.expect(jsonData.message).is.include(\"Поле name успешно изменено\");\r",
+									"    pm.expect(jsonData.message).is.include(\"moshk720@gmail.com\");\r",
+									"});\r",
+									"pm.test(\"result is not error\", function () {\r",
+									"    pm.expect(jsonData.type).is.not.eql(\"error\");\r",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://users.bugred.ru/tasks/rest/useronefield?email=moshk720@gmail.com&field=name&value=Mtest_{{$randomInt}}",
+							"protocol": "http",
+							"host": [
+								"users",
+								"bugred",
+								"ru"
+							],
+							"path": [
+								"tasks",
+								"rest",
+								"useronefield"
+							],
+							"query": [
+								{
+									"key": "email",
+									"value": "moshk720@gmail.com"
+								},
+								{
+									"key": "field",
+									"value": "name"
+								},
+								{
+									"key": "value",
+									"value": "Mtest_{{$randomInt}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
